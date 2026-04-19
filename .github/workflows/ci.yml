@@ -1,28 +1,91 @@
-name: CI
+# ── Etapa 5: CI/CD con GitHub Actions ────────────────────────────────────────
+# Proyecto: Heart Disease MLOps — Dr. Lihki Rubio
+# Se ejecuta en cada push y pull request a main
+
+name: CI — Heart Disease MLOps
 
 on:
   push:
-    branches: ["main"]
+    branches: [main, master]
   pull_request:
-    branches: ["main"]
+    branches: [main, master]
 
 jobs:
-  lint-and-test:
+  build:
+    name: Lint + Tests
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+    steps:
+      # 1. Clonar el repositorio
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      # 2. Configurar Python 3.11 (misma versión que Docker)
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r docker/requirements.txt
+      # 3. Cachear dependencias para acelerar builds futuros
+      - name: Cachear pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('docker/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - name: Run smoke check
+      # 4. Instalar dependencias del proyecto + herramientas de calidad
+      - name: Instalar dependencias
         run: |
-          python -c "import fastapi, sklearn, pandas, numpy, joblib; print('Dependencies OK')"
+          pip install --upgrade pip
+          pip install -r docker/requirements.txt
+          pip install flake8 pytest httpx
+
+      # 5. Linting con flake8
+      #    E501: líneas largas (máx 120 chars)
+      #    W503: salto de línea antes de operador binario
+      - name: Lint — flake8
+        run: |
+          flake8 app/ \
+            --max-line-length=120 \
+            --ignore=W503 \
+            --statistics \
+            --count
+
+      # 6. Crear un modelo dummy para que los tests no fallen
+      #    (en un proyecto real se descargaría el artefacto del modelo)
+      - name: Crear modelo dummy para tests
+        run: |
+          python - <<'PYEOF'
+          import joblib
+          import numpy as np
+          from sklearn.pipeline import Pipeline
+          from sklearn.preprocessing import MinMaxScaler
+          from sklearn.naive_bayes import GaussianNB
+
+          # Modelo mínimo entrenado con datos sintéticos de 15 features
+          np.random.seed(42)
+          X = np.random.rand(50, 15)
+          y = np.random.randint(0, 2, 50)
+
+          pipe = Pipeline([("scaler", MinMaxScaler()), ("clf", GaussianNB())])
+          pipe.fit(X, y)
+          joblib.dump(pipe, "model.joblib")
+          print("✅ Modelo dummy creado para CI")
+          PYEOF
+
+      # 7. Ejecutar tests con pytest
+      - name: Tests — pytest
+        run: |
+          pytest tests/ -v --tb=short
+
+      # 8. Reporte de cobertura (opcional pero recomendado)
+      - name: Resumen del pipeline
+        if: always()
+        run: |
+          echo "══════════════════════════════════"
+          echo "  CI completado — Heart Disease MLOps"
+          echo "  Branch : ${{ github.ref_name }}"
+          echo "  Commit : ${{ github.sha }}"
+          echo "══════════════════════════════════"
