@@ -1,19 +1,51 @@
+# ── Etapa 4: Deployment de Kubernetes ────────────────────────────────────────
+# Proyecto: Heart Disease MLOps — Dr. Lihki Rubio
+# Comando: kubectl apply -f k8s/deployment.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: heart-disease-api
+  name: heart-model
+  labels:
+    app: heart-model
+    version: "1.0.0"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: heart-disease-api
+      app: heart-model
   template:
     metadata:
       labels:
-        app: heart-disease-api
+        app: heart-model
     spec:
       containers:
-        - name: heart-disease-api
-          image: heart-disease-mlops:latest
+        - name: model
+          image: heart-api:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8000
+          env:
+            - name: MODEL_PATH
+              value: /app/model.joblib
+          # ── Health checks ──────────────────────────────────────────────────
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # ── Recursos ───────────────────────────────────────────────────────
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

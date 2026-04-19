@@ -1,12 +1,18 @@
+# ── Etapa 4: Service de Kubernetes ───────────────────────────────────────────
+# Proyecto: Heart Disease MLOps — Dr. Lihki Rubio
+# Comando: kubectl apply -f k8s/service.yaml
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: heart-disease-api-service
+  name: heart-service
+  labels:
+    app: heart-model
 spec:
   selector:
-    app: heart-disease-api
+    app: heart-model
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
-  type: ClusterIP
+  type: LoadBalancer
