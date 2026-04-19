@@ -1,3 +1,4 @@
 data/heart.csv
 .venv/
 minikube-linux-amd64
+.venv311/
