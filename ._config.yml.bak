@@ -1,0 +1,23 @@
+title: Heart Disease MLOps
+author: Luis Cabarcas, Luis Cantillo y Natalia Frias
+logo: logo.png
+
+execute:
+  execute_notebooks: off
+
+parse:
+  myst_enable_extensions:
+    - colon_fence
+    - dollarmath
+    - linkify
+    - substitution
+    - tasklist
+
+html:
+  favicon: logo.png
+  use_repository_button: false
+  use_edit_page_button: false
+
+sphinx:
+  config:
+    html_show_copyright: false

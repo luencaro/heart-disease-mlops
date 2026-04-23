@@ -2,3 +2,5 @@ data/heart.csv
 .venv/
 minikube-linux-amd64
 .venv311/
+# MyST build outputs
+_build

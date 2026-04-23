@@ -1,0 +1,10 @@
+format: jb-book
+root: index
+parts:
+  - caption: Introducción
+    chapters:
+      - file: hallazgos
+  - caption: Análisis y modelado
+    chapters:
+      - file: notebooks/1_model_leakage_demo
+      - file: notebooks/2_model_pipeline_cv

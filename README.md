@@ -1,4 +1,4 @@
-# Heart Disease MLOps 🫀
+# Heart Disease MLOps
 
 Proyecto integrador de Machine Learning con prácticas de MLOps para predecir falla cardíaca.
 

@@ -1,0 +1,22 @@
+version: 1
+project:
+  title: Heart Disease MLOps
+  authors:
+    - name: Luis Cabarcas
+    - name: Luis Cantillo
+    - name: Natalia Frias
+  toc:
+    - file: index.md
+    - title: Introducción
+      children:
+        - file: hallazgos.md
+    - title: Análisis y modelado
+      children:
+        - file: notebooks/1_model_leakage_demo.ipynb
+        - file: notebooks/2_model_pipeline_cv.ipynb
+site:
+  options:
+    logo: logo.png
+    favicon: logo.png
+    folders: true
+  template: book-theme
