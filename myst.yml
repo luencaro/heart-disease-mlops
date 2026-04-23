@@ -7,10 +7,7 @@ project:
     - name: Natalia Frias
   toc:
     - file: index.md
-    - title: Introducción
-      children:
-        - file: hallazgos.md
-    - title: Análisis y modelado
+    - title: Notebooks
       children:
         - file: notebooks/1_model_leakage_demo.ipynb
         - file: notebooks/2_model_pipeline_cv.ipynb
